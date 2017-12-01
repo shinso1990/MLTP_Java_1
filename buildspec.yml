@@ -42,3 +42,4 @@ artifacts:
     - 'ROOT/WEB-INF/lib/spring-expression-4.2.6.RELEASE.jar'
     - 'ROOT/WEB-INF/lib/spring-web-4.2.6.RELEASE.jar'
     - 'ROOT/WEB-INF/lib/spring-webmvc-4.2.6.RELEASE.jar'
+    - 'ROOT/WEB-INF/web.xml'
