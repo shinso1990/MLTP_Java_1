@@ -8,6 +8,7 @@ package Proxy;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -31,15 +32,6 @@ public class ComunicadorApiML {
             setResponseServletStatus(response, responseServlet );
             setResponseServletContentType( response, responseServlet );
             setResponseServletContent(response, responseServlet);
-            try
-            {
-                if(!responseServlet.isCommitted())
-                    responseServlet.flushBuffer();
-            }
-            catch(IOException e1)
-            { 
-                errorTracker.logError(e1);
-            }
         }
         catch(IOException e)
         {
@@ -77,24 +69,19 @@ public class ComunicadorApiML {
         }
     }
 
-    private void setResponseServletContent(HttpResponse response, HttpServletResponse responseServlet)  {
+    private void setResponseServletContent(HttpResponse response, HttpServletResponse responseServlet) throws IOException  {
+        String responseContent;
+        PrintWriter out = null;
+        responseContent = getResponseContent(response);  
+        
         try
         {
-            String responseContent = getResponseContent(response);
-            responseServlet.getWriter().write( responseContent );
-            responseServlet.setContentLength( Integer.parseInt( response.getHeaders("Content-Length")[0].toString() ) ); //responseContent.length() );
+            out = responseServlet.getWriter();
+            out.write( responseContent );
         }
-        catch( IOException e )
+        finally
         {
-            try
-            {
-                responseServlet.sendError( (int)HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
-                errorTracker.logError(e);
-            }
-            catch(IOException e1)
-            {
-                errorTracker.logError(e1);
-            }
+            out.close();
         }
     }
 
