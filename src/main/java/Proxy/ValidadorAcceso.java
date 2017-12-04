@@ -23,51 +23,65 @@ public class ValidadorAcceso {
     public Boolean tieneAcceso( HttpServletRequest request )
     {
         Calendar cal = Calendar.getInstance();
-        //cal.set(Calendar.HOUR_OF_DAY, 0);
-        //cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        cal.set(Calendar.MILLISECOND, 0);
-        String calStr = cal.toString();
         
         String requestIp = request.getServerName();
         String requestUrl = request.getRequestURI();
         String ipUrl = requestIp + requestUrl;
-        ComunicadorRedis cr = new ComunicadorRedis();
+        ComunicadorRedis cr = null;
+        Boolean noSeEncuentraBloqueado = true;
         
-        RedisConfig rcIp = cr.getRedisConfig(requestIp);
-        RedisConfig rcUrl = cr.getRedisConfig(requestUrl);
-        RedisConfig rcIpUrl = cr.getRedisConfig( ipUrl );
-        
-        if( rcIp.bloqueado() || rcUrl.bloqueado() || rcIpUrl.bloqueado()){
-            ComunicadorEstadisticas.guardarInformacionRequest( requestIp, requestUrl, rcIp.bloqueado(), rcUrl.bloqueado(), rcIpUrl.bloqueado(), cal);
-            return false;
-        }
-        else
+        try
         {
-            if( cr.Incr( requestIp + calStr ) > rcIp.cantMaxReq() )
-            {
-                cr.Decr(requestIp + calStr);
-                ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "IP", "MAXREQCOUNTEXC");
-                return false;
-            }
-            if( cr.Incr(requestUrl + calStr ) > rcUrl.cantMaxReq())
-            {
-                cr.Decr(requestIp + calStr );
-                cr.Decr(requestUrl + calStr );
-                ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "URL", "MAXREQCOUNTEXC");
-                return false;
-            }
-            if( cr.Incr(ipUrl + calStr ) > rcIpUrl.cantMaxReq())
-            {
-                cr.Decr(requestIp + calStr );
-                cr.Decr(requestUrl + calStr );
-                cr.Decr(ipUrl + calStr );
-                ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "IPURL", "MAXREQCOUNTEXC");
-                return false;
-            }
+            cr = new ComunicadorRedis();
+
+            RedisConfig rcIp = cr.getRedisConfig(requestIp);
+            RedisConfig rcUrl = cr.getRedisConfig(requestUrl);
+            RedisConfig rcIpUrl = cr.getRedisConfig( ipUrl );
             
+            if( rcIp.bloqueado() || rcUrl.bloqueado() || rcIpUrl.bloqueado()){
+                ComunicadorEstadisticas.guardarInformacionRequest( requestIp, requestUrl, rcIp.bloqueado(), rcUrl.bloqueado(), rcIpUrl.bloqueado(), cal);
+                noSeEncuentraBloqueado = false;
+            }
+            else
+            {
+                String redisKeyIp = requestIp + rcIp.getCalendarForThisKey(cal);
+                String redisKeyUrl = requestUrl + rcUrl.getCalendarForThisKey(cal);
+                String redisKeyIpUrl = ipUrl + rcIpUrl.getCalendarForThisKey(cal);
+                
+                if( cr.Incr( redisKeyIp ) > rcIp.cantMaxReq() )
+                {
+                    cr.Decr( redisKeyIp );
+                    ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "IP", "MAXREQCOUNTEXC");
+                    noSeEncuentraBloqueado = false;
+                }
+                if( cr.Incr( redisKeyUrl  ) > rcUrl.cantMaxReq())
+                {
+                    cr.Decr( redisKeyIp );
+                    cr.Decr( redisKeyUrl );
+                    ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "URL", "MAXREQCOUNTEXC");
+                    noSeEncuentraBloqueado = false;
+                }
+                if( cr.Incr( redisKeyIpUrl ) > rcIpUrl.cantMaxReq())
+                {
+                    cr.Decr( redisKeyIp );
+                    cr.Decr( redisKeyUrl );
+                    cr.Decr( redisKeyIpUrl );
+                    ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "IPURL", "MAXREQCOUNTEXC");
+                    noSeEncuentraBloqueado = false;
+                }
+
+                noSeEncuentraBloqueado = true;
+            }
+        }
+        catch(Exception e)
+        {
+            //TODO: mejorar
+            new ErrorTracker().logError(e);
+        }
+        finally
+        {
             cr.End();
-            return true;
+            return noSeEncuentraBloqueado;
         }
        
     }
