@@ -5,6 +5,7 @@
  */
 package Proxy;
 
+import Proxy.Config.WebXmlConfiguraciones;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -30,6 +31,8 @@ public class Receptor extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        CargarConfiguraciones();
+        
         ValidadorAcceso validador = new ValidadorAcceso();
         if(validador.tieneAcceso(request))
         {
@@ -47,6 +50,13 @@ public class Receptor extends HttpServlet {
             throws ServletException, IOException {
         response.sendError(HttpServletResponse.SC_NOT_FOUND);
     }
+    
+    
+    private void CargarConfiguraciones()
+    {
+        WebXmlConfiguraciones.Inicializar(this);
+    }
+    
 
     /**
      * Returns a short description of the servlet.

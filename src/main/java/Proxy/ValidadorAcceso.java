@@ -39,7 +39,7 @@ public class ValidadorAcceso {
             RedisConfig rcIpUrl = cr.getRedisConfig( ipUrl );
             
             if( rcIp.bloqueado() || rcUrl.bloqueado() || rcIpUrl.bloqueado()){
-                ComunicadorEstadisticas.guardarInformacionRequest( requestIp, requestUrl, rcIp.bloqueado(), rcUrl.bloqueado(), rcIpUrl.bloqueado(), cal);
+                ComunicadorEstadisticas.guardarInformacionRequestBloqueado( requestIp, requestUrl, rcIp.bloqueado(), rcUrl.bloqueado(), rcIpUrl.bloqueado(), cal);
                 noSeEncuentraBloqueado = false;
             }
             else
@@ -48,29 +48,34 @@ public class ValidadorAcceso {
                 String redisKeyUrl = requestUrl + rcUrl.getCalendarForThisKey(cal);
                 String redisKeyIpUrl = ipUrl + rcIpUrl.getCalendarForThisKey(cal);
                 
-                if( cr.Incr( redisKeyIp ) > rcIp.cantMaxReq() )
-                {
-                    cr.Decr( redisKeyIp );
-                    ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "IP", "MAXREQCOUNTEXC");
-                    noSeEncuentraBloqueado = false;
+                end_try: {
+                    if( cr.Incr( redisKeyIp ) > rcIp.cantMaxReq() )
+                    {
+                        cr.Decr( redisKeyIp );
+                        ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "IP", "MAXREQCOUNTEXC");
+                        noSeEncuentraBloqueado = false;
+                        break end_try;
+                    }
+                    if( noSeEncuentraBloqueado && cr.Incr( redisKeyUrl  ) > rcUrl.cantMaxReq())
+                    {
+                        cr.Decr( redisKeyIp );
+                        cr.Decr( redisKeyUrl );
+                        ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "URL", "MAXREQCOUNTEXC");
+                        noSeEncuentraBloqueado = false;
+                        break end_try;
+                    }
+                    if( noSeEncuentraBloqueado && cr.Incr( redisKeyIpUrl ) > rcIpUrl.cantMaxReq())
+                    {
+                        cr.Decr( redisKeyIp );
+                        cr.Decr( redisKeyUrl );
+                        cr.Decr( redisKeyIpUrl );
+                        ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "IPURL", "MAXREQCOUNTEXC");
+                        noSeEncuentraBloqueado = false;
+                        break end_try;
+                    }
+                    ComunicadorEstadisticas.guardarInformacionRequestOK( requestIp, requestUrl, cal);
+                    noSeEncuentraBloqueado = true;
                 }
-                if( cr.Incr( redisKeyUrl  ) > rcUrl.cantMaxReq())
-                {
-                    cr.Decr( redisKeyIp );
-                    cr.Decr( redisKeyUrl );
-                    ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "URL", "MAXREQCOUNTEXC");
-                    noSeEncuentraBloqueado = false;
-                }
-                if( cr.Incr( redisKeyIpUrl ) > rcIpUrl.cantMaxReq())
-                {
-                    cr.Decr( redisKeyIp );
-                    cr.Decr( redisKeyUrl );
-                    cr.Decr( redisKeyIpUrl );
-                    ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "IPURL", "MAXREQCOUNTEXC");
-                    noSeEncuentraBloqueado = false;
-                }
-
-                noSeEncuentraBloqueado = true;
             }
         }
         catch(Exception e)
