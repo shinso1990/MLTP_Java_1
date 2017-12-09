@@ -6,6 +6,7 @@
 package Proxy;
 
 import Proxy.Config.WebXmlConfiguraciones;
+import Proxy.Model.Validacion;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -33,14 +34,18 @@ public class Receptor extends HttpServlet {
         
         CargarConfiguraciones();
         
-        ValidadorAcceso validador = new ValidadorAcceso();
-        if(validador.tieneAcceso(request))
+        if(request.getRequestURI().equals( WebXmlConfiguraciones.HealthRequestUri() ) )
         {
-            new ComunicadorApiML().obtenerYRetornar(request.getRequestURI() , response);
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.flushBuffer();
         }
         else
         {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            Validacion v = ValidadorAcceso.tieneAcceso(request);
+            if(!v.HuboError)
+                new ComunicadorApiML().obtenerYRetornar(request.getRequestURI() , response);
+            else
+                response.sendError(v.HttpStatusCode, v.MensajeError );
         }
     }
 
@@ -52,8 +57,7 @@ public class Receptor extends HttpServlet {
     }
     
     
-    private void CargarConfiguraciones()
-    {
+    private void CargarConfiguraciones() {
         WebXmlConfiguraciones.Inicializar(this);
     }
     
@@ -63,9 +67,10 @@ public class Receptor extends HttpServlet {
      *
      * @return a String containing servlet description
      */
+  /*
     @Override
     public String getServletInfo() {
         return "Proxy mltp";
     }
-
+*/
 }

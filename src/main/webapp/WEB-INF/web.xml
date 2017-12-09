@@ -17,7 +17,13 @@
         <param-name>RedisIpConf</param-name>
         <param-value>192.168.0.104</param-value>
     </context-param>
-    
-    
+    <context-param>
+        <param-name>HealthRequestUri</param-name>
+        <param-value>/STATUS/STATUS/STATUS</param-value>
+    </context-param>
+    <context-param>
+        <param-name>apiMLUrl</param-name>
+        <param-value>https://api.mercadolibre.com</param-value>
+    </context-param>
     
 </web-app>

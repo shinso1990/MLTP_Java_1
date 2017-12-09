@@ -6,11 +6,9 @@
 package Proxy;
 
 import Proxy.Model.RedisConfig;
+import Proxy.Model.Validacion;
 import java.util.Calendar;
 import javax.servlet.http.HttpServletRequest;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
 
 /**
  *
@@ -18,10 +16,9 @@ import redis.clients.jedis.JedisPoolConfig;
  */
 public class ValidadorAcceso {
     
-    
-    
-    public Boolean tieneAcceso( HttpServletRequest request )
+    public static Validacion tieneAcceso( HttpServletRequest request )
     {
+        Validacion res = new Validacion();
         Calendar cal = Calendar.getInstance();
         
         String requestIp = request.getServerName();
@@ -40,41 +37,41 @@ public class ValidadorAcceso {
             
             if( rcIp.bloqueado() || rcUrl.bloqueado() || rcIpUrl.bloqueado()){
                 ComunicadorEstadisticas.guardarInformacionRequestBloqueado( requestIp, requestUrl, rcIp.bloqueado(), rcUrl.bloqueado(), rcIpUrl.bloqueado(), cal);
-                noSeEncuentraBloqueado = false;
+                res = Validacion.Bloqueado();
             }
             else
             {
-                String redisKeyIp = requestIp + rcIp.getCalendarForThisKey(cal);
-                String redisKeyUrl = requestUrl + rcUrl.getCalendarForThisKey(cal);
-                String redisKeyIpUrl = ipUrl + rcIpUrl.getCalendarForThisKey(cal);
+                String redisKeyIp       = rcIp.getCalendarForThisKey(cal) + "_" + requestIp;
+                String redisKeyUrl      = rcUrl.getCalendarForThisKey(cal) + "_"+ requestUrl;
+                String redisKeyIpUrl    = rcIpUrl.getCalendarForThisKey(cal) + "_" + ipUrl;
                 
                 end_try: {
                     if( cr.Incr( redisKeyIp ) > rcIp.cantMaxReq() )
                     {
                         cr.Decr( redisKeyIp );
                         ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "IP", "MAXREQCOUNTEXC");
-                        noSeEncuentraBloqueado = false;
+                        res = Validacion.SeSuperoLaCantMaximaDeRequestIp(requestIp);
                         break end_try;
                     }
-                    if( noSeEncuentraBloqueado && cr.Incr( redisKeyUrl  ) > rcUrl.cantMaxReq())
+                    if( cr.Incr( redisKeyUrl  ) > rcUrl.cantMaxReq())
                     {
                         cr.Decr( redisKeyIp );
                         cr.Decr( redisKeyUrl );
                         ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "URL", "MAXREQCOUNTEXC");
-                        noSeEncuentraBloqueado = false;
+                        res = Validacion.SeSuperoLaCantMaximaDeRequestUrl(requestUrl);
                         break end_try;
                     }
-                    if( noSeEncuentraBloqueado && cr.Incr( redisKeyIpUrl ) > rcIpUrl.cantMaxReq())
+                    if( cr.Incr( redisKeyIpUrl ) > rcIpUrl.cantMaxReq())
                     {
                         cr.Decr( redisKeyIp );
                         cr.Decr( redisKeyUrl );
                         cr.Decr( redisKeyIpUrl );
                         ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "IPURL", "MAXREQCOUNTEXC");
-                        noSeEncuentraBloqueado = false;
+                        res = Validacion.SeSuperoLaCantMaximaDeRequestIpUrl(ipUrl);
                         break end_try;
                     }
                     ComunicadorEstadisticas.guardarInformacionRequestOK( requestIp, requestUrl, cal);
-                    noSeEncuentraBloqueado = true;
+                    res = Validacion.Ok();
                 }
             }
         }
@@ -82,11 +79,12 @@ public class ValidadorAcceso {
         {
             //TODO: mejorar
             new ErrorTracker().logError(e);
+            res = Validacion.ErrorDesconocido();
         }
         finally
         {
             cr.End();
-            return noSeEncuentraBloqueado;
+            return res;
         }
        
     }
