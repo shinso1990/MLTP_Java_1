@@ -15,7 +15,7 @@
     </session-config>
     <context-param>
         <param-name>RedisIpConf</param-name>
-        <param-value>192.168.0.104</param-value>
+        <param-value>192.168.0.101</param-value>
     </context-param>
     <context-param>
         <param-name>HealthRequestUri</param-name>
