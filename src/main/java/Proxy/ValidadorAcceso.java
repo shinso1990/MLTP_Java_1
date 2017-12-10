@@ -36,7 +36,7 @@ public class ValidadorAcceso {
             RedisConfig rcIpUrl = cr.getRedisConfig( ipUrl );
             
             if( rcIp.bloqueado() || rcUrl.bloqueado() || rcIpUrl.bloqueado()){
-                ComunicadorEstadisticas.guardarInformacionRequestBloqueado( requestIp, requestUrl, rcIp.bloqueado(), rcUrl.bloqueado(), rcIpUrl.bloqueado(), cal);
+                ComunicadorEstadisticas.guardarInformacionRequestBloqueado( requestIp, requestUrl, rcIp.bloqueado(), rcUrl.bloqueado(), rcIpUrl.bloqueado(), cal, cr);
                 res = Validacion.Bloqueado();
             }
             else
@@ -49,7 +49,7 @@ public class ValidadorAcceso {
                     if( cr.Incr( redisKeyIp ) > rcIp.cantMaxReq() )
                     {
                         cr.Decr( redisKeyIp );
-                        ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "IP", "MAXREQCOUNTEXC");
+                        ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "IP", "MAXREQCOUNTEXC", cr);
                         res = Validacion.SeSuperoLaCantMaximaDeRequestIp(requestIp);
                         break end_try;
                     }
@@ -57,7 +57,7 @@ public class ValidadorAcceso {
                     {
                         cr.Decr( redisKeyIp );
                         cr.Decr( redisKeyUrl );
-                        ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "URL", "MAXREQCOUNTEXC");
+                        ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "URL", "MAXREQCOUNTEXC", cr);
                         res = Validacion.SeSuperoLaCantMaximaDeRequestUrl(requestUrl);
                         break end_try;
                     }
@@ -66,11 +66,11 @@ public class ValidadorAcceso {
                         cr.Decr( redisKeyIp );
                         cr.Decr( redisKeyUrl );
                         cr.Decr( redisKeyIpUrl );
-                        ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "IPURL", "MAXREQCOUNTEXC");
+                        ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "IPURL", "MAXREQCOUNTEXC", cr);
                         res = Validacion.SeSuperoLaCantMaximaDeRequestIpUrl(ipUrl);
                         break end_try;
                     }
-                    ComunicadorEstadisticas.guardarInformacionRequestOK( requestIp, requestUrl, cal);
+                    ComunicadorEstadisticas.guardarInformacionRequestOK( requestIp, requestUrl, cal, cr);
                     res = Validacion.Ok();
                 }
             }

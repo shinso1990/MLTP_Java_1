@@ -41,11 +41,16 @@ public class Receptor extends HttpServlet {
         }
         else
         {
-            Validacion v = ValidadorAcceso.tieneAcceso(request);
-            if(!v.HuboError)
-                new ComunicadorApiML().obtenerYRetornar(request.getRequestURI() , response);
+            if(!WebXmlConfiguraciones.UsarRedis())
+                ComunicadorApiML.obtenerYRetornar(request.getRequestURI() , response);
             else
-                response.sendError(v.HttpStatusCode, v.MensajeError );
+            {
+                Validacion v = ValidadorAcceso.tieneAcceso(request);
+                if( !v.HuboError )
+                    ComunicadorApiML.obtenerYRetornar(request.getRequestURI() , response);
+                else
+                    response.sendError(v.HttpStatusCode, v.MensajeError );
+            }
         }
     }
 

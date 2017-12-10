@@ -7,7 +7,6 @@ package Proxy;
 
 import Proxy.Config.WebXmlConfiguraciones;
 import Proxy.Model.RedisConfig;
-import org.springframework.beans.factory.annotation.Value;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -69,5 +68,23 @@ public class ComunicadorRedis {
         _pool.destroy();
     }
 
+    void guardarBloqueo(String value) {
+        String key = WebXmlConfiguraciones.KeyListaBloqueados();
+        getJedisInstance().lpush(key, value);
+    }
     
+    void guardarRequestOK(String value) {
+        String key = WebXmlConfiguraciones.KeyListaOK();
+        getJedisInstance().lpush(key, value);
+    }
+    
+    void guardarRequestLimiteSuperado(String value) {
+        String key = WebXmlConfiguraciones.KeyListaLimitados();
+        getJedisInstance().lpush(key, value);
+    }
+
+    void guardarError(String value) {
+        String key = WebXmlConfiguraciones.KeyListaErrores();
+        getJedisInstance().lpush(key, value);
+    }
 }

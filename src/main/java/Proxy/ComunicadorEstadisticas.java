@@ -6,7 +6,6 @@
 package Proxy;
 
 import java.util.Calendar;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  *
@@ -15,19 +14,72 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 public class ComunicadorEstadisticas {
     
     public static void guardarInformacionRequestBloqueado( String ip, String url, Boolean ipBloqueada, 
-            Boolean urlBloqueada, Boolean ipUrlBloqueada, Calendar fechaYHora )
-    {
-       // throw new NotImplementedException();
+            Boolean urlBloqueada, Boolean ipUrlBloqueada, Calendar fechaYHora, ComunicadorRedis cr ) {
+        StringBuilder sb;
+        sb = new StringBuilder();
+        
+        sb.append("{ ");
+        sb.append("IP: '");
+        sb.append(ip);
+        sb.append("',");
+        sb.append("URL: '");
+        sb.append(url); 
+        sb.append("',");
+        sb.append("Fecha: '"); 
+        sb.append(fechaYHora.toString());
+        sb.append("',");
+        sb.append("Bloqueada: '");
+        if(ipBloqueada)
+                sb.append("IP'");
+        else if(urlBloqueada)
+                sb.append("URL'");
+        else if(ipUrlBloqueada)
+                sb.append("IPURL'");   
+        else
+            sb.append("NONE");
+        sb.append("}");
+        
+       cr.guardarBloqueo(sb.toString());
     }
 
-    static void guardarCantMaxReq(Calendar cal, String requestIp, String requestUrl, String url, String maxreqcountexc) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    static void guardarCantMaxReq(Calendar cal, String requestIp, String requestUrl, String quienSupero, String maxreqcountexc, ComunicadorRedis cr) {
+        StringBuilder sb;
+        sb = new StringBuilder();
+        
+        sb.append("{ ");
+        sb.append("IP: '");
+        sb.append(requestIp);
+        sb.append("',");
+        sb.append("URL: '");
+        sb.append(requestUrl); 
+        sb.append("',");
+        sb.append("Fecha: '"); 
+        sb.append(cal.toString());
+        sb.append("',");
+        sb.append("QuienSuperoMRC: '");
+        sb.append(quienSupero);
+        sb.append("'");
+        sb.append("}");
+        
+       cr.guardarRequestLimiteSuperado(sb.toString());
     }
 
-    static void guardarInformacionRequestOK(String requestIp, String requestUrl, Calendar cal) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    static void guardarInformacionRequestOK(String requestIp, String requestUrl, Calendar cal, ComunicadorRedis cr) {
+        StringBuilder sb;
+        sb = new StringBuilder();
+        
+        sb.append("{ ");
+        sb.append("IP: '");
+        sb.append(requestIp);
+        sb.append("',");
+        sb.append("URL: '");
+        sb.append(requestUrl); 
+        sb.append("',");
+        sb.append("Fecha: '"); 
+        sb.append(cal.toString());
+        sb.append("'}");
+        
+       cr.guardarBloqueo(sb.toString());
     }
-    
-    
     
 }

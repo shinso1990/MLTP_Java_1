@@ -15,7 +15,7 @@
     </session-config>
     <context-param>
         <param-name>RedisIpConf</param-name>
-        <param-value>rrrrr.rz5umx.0001.use1.cache.amazonaws.com</param-value>
+        <param-value>192.168.0.104</param-value>
     </context-param>
     <context-param>
         <param-name>HealthRequestUri</param-name>
@@ -25,5 +25,26 @@
         <param-name>apiMLUrl</param-name>
         <param-value>https://api.mercadolibre.com</param-value>
     </context-param>
+    <context-param>
+        <param-name>keyListaErrores</param-name>
+        <param-value>LISTA_ERRORES</param-value>
+    </context-param>
+    <context-param>
+        <param-name>keyListaOk</param-name>
+        <param-value>LISTA_OK</param-value>
+    </context-param>
+    <context-param>
+        <param-name>keyListaBloqueados</param-name>
+        <param-value>LISTA_BLOQUEADOS</param-value>
+    </context-param>
+    <context-param>
+        <param-name>keyListaLimitados</param-name>
+        <param-value>LISTA_LIMITADOS</param-value>
+    </context-param>
+    <context-param>
+        <param-name>usarRedis</param-name>
+        <param-value>0</param-value>
+    </context-param>
+    
     
 </web-app>
