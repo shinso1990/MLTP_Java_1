@@ -11,30 +11,37 @@ package Proxy;
  */
 public class ErrorTracker {
     
-    public static void logError(Exception e )
-    {
-        StringBuilder sb;
-        sb = new StringBuilder();
-        
-        sb.append("{ Mensaje: '"); 
-        sb.append(e.getMessage()  ); 
-        sb.append("', StackTrace: '");
-        sb.append(e.getStackTrace());
-        sb.append("'}");
-        
-        new ComunicadorRedis().guardarError(sb.toString());
+    public static void logError(Exception e ) {
+    
+        try 
+        {
+            StringBuilder sb;
+            sb = new StringBuilder();
+
+            sb.append("{ Mensaje: '"); 
+            sb.append(e.getMessage()  ); 
+            sb.append("', StackTrace: '");
+            sb.append(e.getStackTrace());
+            sb.append("'}");
+
+            new ComunicadorRedis().guardarError(sb.toString());
+        }
+        finally{}
     }
     
-    public static void logError(String error )
-    {
-        StringBuilder sb;
-        sb = new StringBuilder();
-        
-        sb.append("{ Mensaje: '"); 
-        sb.append(error); 
-        sb.append("' }");
-        
-        new ComunicadorRedis().guardarError(sb.toString());
+    public static void logError(String error ) {
+        try 
+        {
+            StringBuilder sb;
+            sb = new StringBuilder();
+
+            sb.append("{ Mensaje: '"); 
+            sb.append(error); 
+            sb.append("' }");
+
+            new ComunicadorRedis().guardarError(sb.toString());
+        }
+        finally{}
     }
     
 }

@@ -83,7 +83,8 @@ public class ValidadorAcceso {
         }
         finally
         {
-            cr.End();
+            if(cr != null)
+                cr.End();
             return res;
         }
        
