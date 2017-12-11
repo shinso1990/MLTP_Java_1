@@ -48,6 +48,8 @@ public class ComunicadorRedis {
 
     private RedisConfig setAndGetDefaultRedisConfig(String key) {
         String drc = getJedisInstance().get( "REDIS_DEFAULT_CONFIG");
+        if(drc == null)
+            drc="1,10,1";
         getJedisInstance().set(key, drc);
                 
                 
