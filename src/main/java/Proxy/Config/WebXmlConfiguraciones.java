@@ -24,6 +24,7 @@ public class WebXmlConfiguraciones {
        _keyListaBloqueados = s.getServletConfig().getServletContext().getInitParameter("keyListaBloqueados");
        _keyListaLimitados = s.getServletConfig().getServletContext().getInitParameter("keyListaLimitados");
        _usarRedis = s.getServletConfig().getServletContext().getInitParameter("usarRedis");
+       _lastUpdate = Calendar.getInstance();
     }
     
     public static void Inicializar(Servlet s) {
