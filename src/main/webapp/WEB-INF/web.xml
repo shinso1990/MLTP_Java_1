@@ -15,7 +15,7 @@
     </session-config>
     <context-param>
         <param-name>RedisIpConf</param-name>
-        <param-value>rrrrr.rz5umx.0001.use1.cache.amazonaws.com</param-value>
+        <param-value>172.31.17.112</param-value>
     </context-param>
     <context-param>
         <param-name>HealthRequestUri</param-name>
