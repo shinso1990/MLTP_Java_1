@@ -24,7 +24,9 @@ public class WebXmlConfiguraciones {
        _keyListaBloqueados = s.getServletConfig().getServletContext().getInitParameter("keyListaBloqueados");
        _keyListaLimitados = s.getServletConfig().getServletContext().getInitParameter("keyListaLimitados");
        _usarRedis = s.getServletConfig().getServletContext().getInitParameter("usarRedis");
+       _lastDefaultConfig = s.getServletConfig().getServletContext().getInitParameter("lastDefaultConfig");
        _lastUpdate = Calendar.getInstance();
+       
     }
     
     public static void Inicializar(Servlet s) {
@@ -69,11 +71,12 @@ public class WebXmlConfiguraciones {
     public static Calendar LastUpdate() {
         return _singleInstance._lastUpdate;
     }
-    public static Boolean UsarRedis()
-    {
+    public static Boolean UsarRedis() {
      return _singleInstance._usarRedis.equals("1");   
     }
-    
+    public static String LastDefaultConfig() {
+        return _singleInstance._lastDefaultConfig;
+    }
     public WebXmlConfiguraciones getInstance() {
         return _singleInstance;
     }
@@ -87,6 +90,7 @@ public class WebXmlConfiguraciones {
     private String _keyListaLimitados;
     private Calendar _lastUpdate;
     private String _usarRedis;
+    private String _lastDefaultConfig;
     //public String RedisIpConfig(){
         //if(_redisIpConfig == null)
         //    _redisIpConfig = s.getServletConfig().getServletContext().getInitParameter("RedisIpConf");
@@ -102,7 +106,8 @@ public class WebXmlConfiguraciones {
                 "\"keyListaErrores\":\"" + KeyListaErrores()+ "\", "+
                 "\"keyListaOK\":\"" + KeyListaOK()+ "\", "+
                 "\"keyListaLimitados\":\"" + KeyListaLimitados()+ "\", "+
-                "\"UsarRedis\":\"" + UsarRedis().toString()  + "\" "+
+                "\"UsarRedis\":\"" + UsarRedis().toString()  + "\", "+
+                "\"LastDefaultConfig\":\"" + LastDefaultConfig() + "\" "+
                 "}";
         }
         catch(Exception e)

@@ -19,24 +19,18 @@ public class ComunicadorRedis {
     JedisPool _pool;
     Jedis _jedis;
     
-    
-    
-    //TODO: MEJORAR GET CONFIG
-    public ComunicadorRedis()
-    {
+    public ComunicadorRedis() {
         _pool = new JedisPool(new JedisPoolConfig(), WebXmlConfiguraciones.RedisIpConfig());
         _jedis = null;
     }
     
-    private Jedis getJedisInstance()
-    {
+    private Jedis getJedisInstance() {
         if(_jedis == null)
             _jedis = _pool.getResource();
         return _jedis;
     }
     
-    public RedisConfig getRedisConfig(String key)
-    {
+    public RedisConfig getRedisConfig(String key) {
         String value = getJedisInstance().get( key );
         RedisConfig rc = null;
         if(value == null)
@@ -47,12 +41,11 @@ public class ComunicadorRedis {
     }
 
     private RedisConfig setAndGetDefaultRedisConfig(String key) {
-        String drc = getJedisInstance().get( "REDIS_DEFAULT_CONFIG");
+        String drc = getJedisInstance().get("REDIS_DEFAULT_CONFIG");
         if(drc == null)
-            drc="1,10,1";
+            drc = WebXmlConfiguraciones.LastDefaultConfig();  //NO DEBERÍA USARSE ESTA CONFIGURACIÓN
         getJedisInstance().set(key, drc);
-                
-                
+
         return new RedisConfig(drc);
     }
 
@@ -64,8 +57,7 @@ public class ComunicadorRedis {
         return getJedisInstance().decr(key);
     }
     
-     public void End()
-    {
+     public void End() {
         _jedis.close();
         _pool.destroy();
     }
