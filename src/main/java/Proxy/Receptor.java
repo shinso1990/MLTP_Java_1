@@ -8,6 +8,7 @@ package Proxy;
 import Proxy.Config.WebXmlConfiguraciones;
 import Proxy.Model.Validacion;
 import java.io.IOException;
+import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -37,7 +38,10 @@ public class Receptor extends HttpServlet {
         if(request.getRequestURI().equals( WebXmlConfiguraciones.HealthRequestUri() ) )
         {
             response.setStatus(HttpServletResponse.SC_OK);
-            response.flushBuffer();
+            PrintWriter pw =  response.getWriter();
+            pw.write( WebXmlConfiguraciones.AsString() );
+            pw.flush();
+            //response.flushBuffer();
         }
         else
         {

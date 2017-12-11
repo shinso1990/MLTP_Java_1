@@ -71,7 +71,7 @@ public class WebXmlConfiguraciones {
     }
     public static Boolean UsarRedis()
     {
-     return _singleInstance._usarRedis == "1";   
+     return _singleInstance._usarRedis.equals("1");   
     }
     
     public WebXmlConfiguraciones getInstance() {
@@ -92,6 +92,25 @@ public class WebXmlConfiguraciones {
         //    _redisIpConfig = s.getServletConfig().getServletContext().getInitParameter("RedisIpConf");
     //    return _redisIpConfig;
     //}
+    
+    public static String AsString()
+    {
+        try{
+        return "{ \"redisIp\":\"" + RedisIpConfig() + "\", "+
+                "\"apiMl\":\"" + ApiMLUrl()+ "\", "+
+                "\"healthRequestPath\":\"" + HealthRequestUri()+ "\", "+
+                "\"keyListaErrores\":\"" + KeyListaErrores()+ "\", "+
+                "\"keyListaOK\":\"" + KeyListaOK()+ "\", "+
+                "\"keyListaLimitados\":\"" + KeyListaLimitados()+ "\", "+
+                "\"UsarRedis\":\"" + UsarRedis().toString()  + "\" "+
+                "}";
+        }
+        catch(Exception e)
+        {
+            return "error";
+        }
+    }
+    
     
     
     
