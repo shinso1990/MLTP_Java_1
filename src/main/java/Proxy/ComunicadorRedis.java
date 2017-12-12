@@ -7,6 +7,7 @@ package Proxy;
 
 import Proxy.Config.WebXmlConfiguraciones;
 import Proxy.Model.RedisConfig;
+import java.util.Set;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
@@ -43,7 +44,7 @@ public class ComunicadorRedis {
     private RedisConfig setAndGetDefaultRedisConfig(String key) {
         String drc = getJedisInstance().get("REDIS_DEFAULT_CONFIG");
         if(drc == null)
-            drc = WebXmlConfiguraciones.LastDefaultConfig();  //NO DEBERÍA USARSE ESTA CONFIGURACIÓN
+            drc = WebXmlConfiguraciones.LastDefaultConfig();  //NO DEBERï¿½A USARSE ESTA CONFIGURACIï¿½N
         getJedisInstance().set(key, drc);
 
         return new RedisConfig(drc);
@@ -56,6 +57,19 @@ public class ComunicadorRedis {
     Long Decr(String key) {
         return getJedisInstance().decr(key);
     }
+
+    public String Get(String key)
+    {
+        return getJedisInstance().get(key);
+    } 
+    public void Set(String key, String value)
+    {
+        getJedisInstance().set(key,value);
+    } 
+    public Set<String> Keys(String pattern)
+    {
+        return getJedisInstance().keys(pattern);
+    } 
     
      public void End() {
         _jedis.close();

@@ -9,6 +9,7 @@ import Proxy.Config.WebXmlConfiguraciones;
 import Proxy.Model.Validacion;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -42,6 +43,28 @@ public class Receptor extends HttpServlet {
             pw.write( WebXmlConfiguraciones.AsString() );
             pw.flush();
             //response.flushBuffer();
+        }
+        else if(request.getRequestURI().startsWith("/REDIS/") )
+        {
+            response.setStatus(HttpServletResponse.SC_OK);
+            PrintWriter pw =  response.getWriter();
+            
+            
+            String[] items = request.getRequestURI().split("/");
+            if(items[1] =="GET")
+                pw.write(new ComunicadorRedis().Get(items[2]));
+            else if(items[1]=="SET")
+                new ComunicadorRedis().Set(items[2],items[3] );
+            else if(items[1]=="KEYS")
+            {
+                Set<String> set = new ComunicadorRedis().Keys(items[2]);
+                Object[] arr = set.toArray();
+                for(int i = 0; i< set.size();i++){
+                    pw.println(arr[i]);
+                }
+            }
+            pw.flush();
+
         }
         else
         {
