@@ -56,7 +56,12 @@ public class Receptor extends HttpServlet {
             pw.write("Items 0: "+items[0]);
             if(items[2].equals("GET")){
                 pw.write("GET ANTES");
+                try{
                 pw.write(new ComunicadorRedis().Get(items[3]));
+                }
+                catch(Exception e){
+                    pw.write(e.getMessage());
+                }
                 pw.write("GET DESPUES");
             }
             else if(items[2].equals("SET")){
