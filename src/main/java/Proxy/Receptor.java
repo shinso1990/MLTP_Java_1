@@ -54,17 +54,17 @@ public class Receptor extends HttpServlet {
             pw.write("SE va a comenzar");
             pw.write("Items 0: "+items[0]);
             pw.write("Items 0: "+items[0]);
-            if(items[2] =="GET"){
+            if(items[2].equals("GET")){
                 pw.write("GET ANTES");
                 pw.write(new ComunicadorRedis().Get(items[3]));
                 pw.write("GET DESPUES");
             }
-            else if(items[2]=="SET"){
+            else if(items[2].equals("SET")){
                 pw.write("SET ANTES");
                 new ComunicadorRedis().Set(items[3],items[4] );
                 pw.write("SET DESPUES");
             }
-            else if(items[2]=="KEYS")
+            else if(items[2].equals("KEYS"))
             {
                 Set<String> set = new ComunicadorRedis().Keys(items[2]);
                 Object[] arr = set.toArray();
