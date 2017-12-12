@@ -48,29 +48,17 @@ public class Receptor extends HttpServlet {
         {
             response.setStatus(HttpServletResponse.SC_OK);
             PrintWriter pw =  response.getWriter();
-            pw.write(request.getRequestURI());
-            
             String[] items = request.getRequestURI().split("/");
-            pw.write("SE va a comenzar");
-            pw.write("Items 0: "+items[0]);
-            pw.write("Items 0: "+items[0]);
             if(items[2].equals("GET")){
-                pw.write("GET ANTES");
                 try{
-                    pw.write(items[1]);
-                    pw.write(items[2]);
-                    pw.write(items[3]);
                 pw.write(new ComunicadorRedis().Get(items[3]));
                 }
                 catch(Exception e){
                     pw.write(e.getMessage());
                 }
-                pw.write("GET DESPUES");
             }
             else if(items[2].equals("SET")){
-                pw.write("SET ANTES");
                 new ComunicadorRedis().Set(items[3],items[4] );
-                pw.write("SET DESPUES");
             }
             else if(items[2].equals("KEYS"))
             {
