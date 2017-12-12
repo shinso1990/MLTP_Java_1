@@ -15,7 +15,15 @@
     </session-config>
     <context-param>
         <param-name>RedisIpConf</param-name>
+        <param-value>172.31.17.112</param-value>
+    </context-param>
+    <context-param>
+        <param-name>DES</param-name>
         <param-value>192.168.0.104</param-value>
+    </context-param>
+    <context-param>
+        <param-name>PROD</param-name>
+        <param-value>172.31.17.112</param-value>
     </context-param>
     <context-param>
         <param-name>HealthRequestUri</param-name>
