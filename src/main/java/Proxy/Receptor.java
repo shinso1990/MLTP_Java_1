@@ -51,11 +51,11 @@ public class Receptor extends HttpServlet {
             
             
             String[] items = request.getRequestURI().split("/");
-            if(items[1] =="GET")
-                pw.write(new ComunicadorRedis().Get(items[2]));
-            else if(items[1]=="SET")
-                new ComunicadorRedis().Set(items[2],items[3] );
-            else if(items[1]=="KEYS")
+            if(items[2] =="GET")
+                pw.write(new ComunicadorRedis().Get(items[3]));
+            else if(items[2]=="SET")
+                new ComunicadorRedis().Set(items[3],items[4] );
+            else if(items[2]=="KEYS")
             {
                 Set<String> set = new ComunicadorRedis().Keys(items[2]);
                 Object[] arr = set.toArray();
