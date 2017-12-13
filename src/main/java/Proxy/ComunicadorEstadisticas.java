@@ -5,6 +5,7 @@
  */
 package Proxy;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 /**
@@ -14,7 +15,7 @@ import java.util.Calendar;
 public class ComunicadorEstadisticas {
     
     public static void guardarInformacionRequestBloqueado( String ip, String url, Boolean ipBloqueada, 
-            Boolean urlBloqueada, Boolean ipUrlBloqueada, Calendar fechaYHora, ComunicadorRedis cr ) {
+            Boolean urlBloqueada, Boolean ipUrlBloqueada, Calendar cal, ComunicadorRedis cr ) {
         StringBuilder sb;
         sb = new StringBuilder();
         
@@ -26,7 +27,7 @@ public class ComunicadorEstadisticas {
         sb.append(url); 
         sb.append("',");
         sb.append("Fecha: '"); 
-        sb.append(fechaYHora.toString());
+        sb.append(CalendarToString(cal));
         sb.append("',");
         sb.append("Bloqueada: '");
         if(ipBloqueada)
@@ -54,7 +55,7 @@ public class ComunicadorEstadisticas {
         sb.append(requestUrl); 
         sb.append("',");
         sb.append("Fecha: '"); 
-        sb.append(cal.toString());
+        sb.append(CalendarToString(cal));
         sb.append("',");
         sb.append("QuienSuperoMRC: '");
         sb.append(quienSupero);
@@ -76,10 +77,16 @@ public class ComunicadorEstadisticas {
         sb.append(requestUrl); 
         sb.append("',");
         sb.append("Fecha: '"); 
-        sb.append(cal.toString());
+        sb.append( CalendarToString(cal) );
         sb.append("'}");
         
        cr.guardarBloqueo(sb.toString());
+    }
+    
+    private static String CalendarToString(Calendar cal)
+    {
+        SimpleDateFormat formato = new SimpleDateFormat("yyyyMMddHHmmss");
+        return formato.format(cal.getTime());
     }
     
 }
