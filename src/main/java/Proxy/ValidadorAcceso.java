@@ -21,7 +21,12 @@ public class ValidadorAcceso {
         Validacion res = new Validacion();
         Calendar cal = Calendar.getInstance();
         
-        String requestIp = request.getServerName();
+        String requestIp = request.getHeader("X-FORWARDED-FOR");  
+            if (requestIp == null) {  
+              requestIp = request.getRemoteAddr();  
+        }
+        
+        //String requestIp = request.getRemoteAddr();
         String requestUrl = request.getRequestURI();
         String ipUrl = requestIp + requestUrl;
         ComunicadorRedis cr = null;
