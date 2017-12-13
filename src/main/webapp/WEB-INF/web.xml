@@ -15,7 +15,7 @@
     </session-config>
     <context-param>
         <param-name>RedisIpConf</param-name>
-        <param-value>mycachecluster.eaogs8.0001.usw2.cache.amazonaws.com</param-value>
+        <param-value>redisproxy.rz5umx.ng.0001.use1.cache.amazonaws.com</param-value>
     </context-param>
     <context-param>
         <param-name>HealthRequestUri</param-name>
