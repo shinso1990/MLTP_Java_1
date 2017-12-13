@@ -21,13 +21,14 @@ public class ComunicadorRedis {
     Jedis _jedis;
     
     public ComunicadorRedis() {
-        _pool = new JedisPool(new JedisPoolConfig(), WebXmlConfiguraciones.RedisIpConfig());
-        _jedis = null;
+        //_pool = new JedisPool(new JedisPoolConfig(), WebXmlConfiguraciones.RedisIpConfig());
+        //_jedis = null;
     }
     
     private Jedis getJedisInstance() {
         if(_jedis == null)
-            _jedis = _pool.getResource();
+        //    _jedis = _pool.getResource();
+            _jedis = new Jedis(WebXmlConfiguraciones.RedisIpConfig());
         return _jedis;
     }
     
@@ -73,7 +74,7 @@ public class ComunicadorRedis {
     
      public void End() {
         _jedis.close();
-        _pool.destroy();
+        //_pool.destroy();
     }
 
     void guardarBloqueo(String value) {
