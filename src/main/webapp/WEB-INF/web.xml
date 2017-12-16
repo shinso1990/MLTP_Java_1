@@ -49,5 +49,9 @@
         <param-name>lastDefaultConfig</param-name>
         <param-value>1,10,0</param-value>
     </context-param>
+    <context-param>
+        <param-name>hostsMongoDB</param-name>
+        <param-value>ec2-34-201-91-193.compute-1.amazonaws.com:27017</param-value>
+    </context-param>
     
 </web-app>

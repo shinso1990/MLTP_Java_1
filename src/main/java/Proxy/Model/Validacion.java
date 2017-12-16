@@ -5,6 +5,7 @@
  */
 package Proxy.Model;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -13,47 +14,31 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class Validacion {
 
-    
-    public Boolean HuboError;
-    public String MensajeError;
-    public int HttpStatusCode;
-    
-    public Validacion()
-    {
-        this.HuboError = false;
-        this.MensajeError = "" ;
-        this.HttpStatusCode = 0;
+    public static void ErrorDesconocido(RequestResponseInfo info, Exception e)    {
+        info.MensajeError = "Error interno";
+        info.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        info.HayError = true;
     }
     
-    public Validacion(Boolean huboError, String mensajeError, int httpStatusCode  )
-    {
-        this.HuboError = huboError;
-        this.MensajeError = mensajeError;
-        this.HttpStatusCode = httpStatusCode;
+    public static void Ok(RequestResponseInfo info)    {
+       info.setStatus(HttpServletResponse.SC_OK);
+       info.Permitido = 1;
+       info.TieneAcceso = true;
     }
     
-    public static Validacion ErrorDesconocido()
-    {
-       return  new Validacion(true,"Error interno",HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
+    public static void Limitado(RequestResponseInfo info, String causa) {
+        info.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        info.CausaLimiteOBloqueo = causa;
+        info.TieneAcceso = false;
+        info.MensajeError = "Se supero el límite permitido de request para " + causa;
+        info.Limitado = 1;
     }
     
-    public static Validacion SeSuperoLaCantMaximaDeRequestIp(String ip )
-    {
-       return  new Validacion(true,"Se supero la cantidad máxima de request de la IP: " + ip ,HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
-    }
-    public static Validacion SeSuperoLaCantMaximaDeRequestUrl(String url )
-    {
-       return  new Validacion(true,"Se supero la cantidad máxima de request a la URL: " + url ,HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
-    }
-    public static Validacion SeSuperoLaCantMaximaDeRequestIpUrl(String ipUrl )
-    {
-       return  new Validacion(true,"Se supero la cantidad máxima de request a la IpUrl: " + ipUrl ,HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
-    }
-    public static Validacion Ok()
-    {
-       return  new Validacion(false,""  ,HttpServletResponse.SC_OK);
-    }
-    public static Validacion Bloqueado() {
-        return  new Validacion(true,"Su solicitud fue bloqueada", HttpServletResponse.SC_BAD_REQUEST );
+    public static void Bloqueado(RequestResponseInfo info, String causa) {
+        info.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        info.CausaLimiteOBloqueo = causa;
+        info.TieneAcceso = false;
+        info.MensajeError = "Se produjo un bloqueo por " + causa;
+        info.Bloqueado = 1;
     }
 }

@@ -6,10 +6,10 @@
 package Proxy;
 
 import Proxy.Config.WebXmlConfiguraciones;
+import Proxy.Model.RequestResponseInfo;
 import Proxy.Model.Validacion;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.Set;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -36,54 +36,29 @@ public class Receptor extends HttpServlet {
         
         CargarConfiguraciones();
         
-        if(request.getRequestURI().equals( WebXmlConfiguraciones.HealthRequestUri() ) )
+        RequestResponseInfo info = new RequestResponseInfo(request, response);
+        
+        if(info.URI.equals( WebXmlConfiguraciones.HealthRequestUri() ) )
         {
-            response.setStatus(HttpServletResponse.SC_OK);
-            PrintWriter pw =  response.getWriter();
+            info.setStatus(HttpServletResponse.SC_OK);
+            PrintWriter pw =  info.getWriter();
             pw.write( WebXmlConfiguraciones.AsString() );
-            pw.flush();
-            //response.flushBuffer();
-        }
-        else if(request.getRequestURI().startsWith("/REDIS/") )
-        {
-            response.setStatus(HttpServletResponse.SC_OK);
-            PrintWriter pw =  response.getWriter();
-            String[] items = request.getRequestURI().split("/");
-            if(items[2].equals("GET")){
-                try{
-                pw.write(new ComunicadorRedis().Get(items[3]));
-                }
-                catch(Exception e){
-                    pw.write(e.getMessage());
-                }
-            }
-            else if(items[2].equals("SET")){
-                new ComunicadorRedis().Set(items[3],items[4] );
-            }
-            else if(items[2].equals("KEYS"))
-            {
-                Set<String> set = new ComunicadorRedis().Keys(items[2]);
-                Object[] arr = set.toArray();
-                for(int i = 0; i< set.size();i++){
-                    pw.write(arr[i] + "  --,--  ") ;
-                }
-            }
-            pw.flush();
-
         }
         else
         {
             if(!WebXmlConfiguraciones.UsarRedis())
-                ComunicadorApiML.obtenerYRetornar(request.getRequestURI() , response);
+                ComunicadorApiML.obtenerYRetornar(info);
             else
             {
-                Validacion v = ValidadorAcceso.tieneAcceso(request);
-                if( !v.HuboError )
-                    ComunicadorApiML.obtenerYRetornar(request.getRequestURI() , response);
-                else
-                    response.sendError(v.HttpStatusCode, v.MensajeError );
+                ValidadorAcceso.VerificarAcceso(info);
+                
+                if( info.TieneAcceso )
+                    ComunicadorApiML.obtenerYRetornar(info);
             }
         }
+        info.sendResponse();
+        if(true) //hay que loguear en mongodb?
+            info.GuardarLog();
     }
 
     

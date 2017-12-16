@@ -5,10 +5,9 @@
  */
 package Proxy;
 
-import Proxy.Model.RedisConfig;
+import Proxy.Model.RequestResponseInfo;
 import Proxy.Model.Validacion;
 import java.util.Calendar;
-import javax.servlet.http.HttpServletRequest;
 
 /**
  *
@@ -16,84 +15,64 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class ValidadorAcceso {
     
-    public static Validacion tieneAcceso( HttpServletRequest request )
+    public static void VerificarAcceso( RequestResponseInfo info )
     {
-        Validacion res = new Validacion();
-        Calendar cal = Calendar.getInstance();
-        
-        String requestIp = request.getHeader("X-FORWARDED-FOR");  
-            if (requestIp == null) {  
-              requestIp = request.getRemoteAddr();  
-        }
-        
-        //String requestIp = request.getRemoteAddr();
-        String requestUrl = request.getRequestURI();
-        String ipUrl = requestIp + requestUrl;
         ComunicadorRedis cr = null;
-        Boolean noSeEncuentraBloqueado = true;
-        
         try
         {
             cr = new ComunicadorRedis();
 
-            RedisConfig rcIp = cr.getRedisConfig(requestIp);
-            RedisConfig rcUrl = cr.getRedisConfig(requestUrl);
-            RedisConfig rcIpUrl = cr.getRedisConfig( ipUrl );
+            info.RedisConfigIP =  cr.getRedisConfig(info.IP);
+            info.RedisConfigURI = cr.getRedisConfig(info.URI);
+            info.RedisConfigIPURI = cr.getRedisConfig( info.IPURI );
             
-            if( rcIp.bloqueado() || rcUrl.bloqueado() || rcIpUrl.bloqueado()){
-                ComunicadorEstadisticas.guardarInformacionRequestBloqueado( requestIp, requestUrl, rcIp.bloqueado(), rcUrl.bloqueado(), rcIpUrl.bloqueado(), cal, cr);
-                res = Validacion.Bloqueado();
-            }
+            if( info.RedisConfigIP.bloqueado())
+                Validacion.Bloqueado(info, "IP");
+            else if (info.RedisConfigURI.bloqueado())
+                Validacion.Bloqueado(info, "URI");
+            else if (info.RedisConfigIPURI.bloqueado())
+                Validacion.Bloqueado(info, "IPURI");
             else
             {
-                String redisKeyIp       = rcIp.getCalendarForThisKey(cal) + "_" + requestIp;
-                String redisKeyUrl      = rcUrl.getCalendarForThisKey(cal) + "_"+ requestUrl;
-                String redisKeyIpUrl    = rcIpUrl.getCalendarForThisKey(cal) + "_" + ipUrl;
+                String redisKeyIp       = info.getRedisKeyIP();  
+                String redisKeyUri      = info.getRedisKeyURI();
+                String redisKeyIpUrl    = info.getRedisKeyIPURI();
                 
                 end_try: {
-                    if( cr.Incr( redisKeyIp ) > rcIp.cantMaxReq() )
+                    if( cr.Incr( redisKeyIp ) > info.RedisConfigIP.cantMaxReq() )
                     {
                         cr.Decr( redisKeyIp );
-                        ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "IP", "MAXREQCOUNTEXC", cr);
-                        res = Validacion.SeSuperoLaCantMaximaDeRequestIp(requestIp);
+                        Validacion.Limitado(info, "IP");
                         break end_try;
                     }
-                    if( cr.Incr( redisKeyUrl  ) > rcUrl.cantMaxReq())
+                    if( cr.Incr(redisKeyUri  ) > info.RedisConfigURI.cantMaxReq())
                     {
                         cr.Decr( redisKeyIp );
-                        cr.Decr( redisKeyUrl );
-                        ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "URL", "MAXREQCOUNTEXC", cr);
-                        res = Validacion.SeSuperoLaCantMaximaDeRequestUrl(requestUrl);
+                        cr.Decr(redisKeyUri );
+                        Validacion.Limitado(info, "URI");
                         break end_try;
                     }
-                    if( cr.Incr( redisKeyIpUrl ) > rcIpUrl.cantMaxReq())
+                    if( cr.Incr( redisKeyIpUrl ) > info.RedisConfigIPURI.cantMaxReq())
                     {
                         cr.Decr( redisKeyIp );
-                        cr.Decr( redisKeyUrl );
+                        cr.Decr(redisKeyUri );
                         cr.Decr( redisKeyIpUrl );
-                        ComunicadorEstadisticas.guardarCantMaxReq(cal, requestIp, requestUrl, "IPURL", "MAXREQCOUNTEXC", cr);
-                        res = Validacion.SeSuperoLaCantMaximaDeRequestIpUrl(ipUrl);
+                        Validacion.Limitado(info, "IPURI");
                         break end_try;
                     }
-                    ComunicadorEstadisticas.guardarInformacionRequestOK( requestIp, requestUrl, cal, cr);
-                    res = Validacion.Ok();
+                    Validacion.Ok(info);
                 }
             }
         }
         catch(Exception e)
         {
-            //TODO: mejorar
-            new ErrorTracker().logError(e);
-            res = Validacion.ErrorDesconocido();
+            Validacion.ErrorDesconocido(info, e);
         }
         finally
         {
             if(cr != null)
                 cr.End();
-            return res;
         }
-       
     }
-    
     
 }

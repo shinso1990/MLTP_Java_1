@@ -6,6 +6,7 @@
 package Proxy;
 
 import Proxy.Config.WebXmlConfiguraciones;
+import Proxy.Model.RequestResponseInfo;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -22,16 +23,19 @@ import org.apache.http.impl.client.DefaultHttpClient;
  */
 public class ComunicadorApiML {
     
-    public static void obtenerYRetornar( String urn, HttpServletResponse responseServlet ) {
+    public static void obtenerYRetornar( RequestResponseInfo info ) {
         try
         {
-            HttpResponse response = sendGetToMLAPI(urn); ;
-            setResponseServletStatus(response, responseServlet );
-            setResponseServletContentType( response, responseServlet );
-            setResponseServletContent(response, responseServlet);
+            HttpResponse response = sendGetToMLAPI(info.URI);
+            
+            info.setStatus(response.getStatusLine().getStatusCode());
+            
+            setResponseServletContentType( response, info  );
+            setResponseServletContent(response, info.getWriter());
         }
         catch(IOException e)
         {
+            info.closeWriter();
             try
             {
                 responseServlet.sendError((int)HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
@@ -55,29 +59,19 @@ public class ComunicadorApiML {
        return result.toString();
     }
 
-    private static void setResponseServletContentType(HttpResponse response, HttpServletResponse responseServlet) {
+    private static void setResponseServletContentType(HttpResponse response, RequestResponseInfo info) {
         if(response.getHeaders("Content-Type").length > 0 ){
             String gv = response.getHeaders("Content-Type")[0].getValue();
-            responseServlet.setContentType( gv );
+            info.setContentType( gv );
         }
         else
-            responseServlet.setContentType( "text/json" );
+            info.setContentType( "text/json" );
     }
 
-    private static void setResponseServletContent(HttpResponse response, HttpServletResponse responseServlet) throws IOException  {
+    private static void setResponseServletContent(HttpResponse response, PrintWriter writter ) throws IOException  {
         String responseContent;
-        PrintWriter out = null;
         responseContent = getResponseContent(response);  
-        
-        try
-        {
-            out = responseServlet.getWriter();
-            out.write( responseContent );
-        }
-        finally
-        {
-            out.close();
-        }
+        writter.write( responseContent );
     }
 
     private static void setResponseServletStatus(HttpResponse response, HttpServletResponse responseServlet) {
@@ -90,5 +84,6 @@ public class ComunicadorApiML {
         HttpGet request = new HttpGet(url);
         return client.execute(request);
     }
+
     
 }

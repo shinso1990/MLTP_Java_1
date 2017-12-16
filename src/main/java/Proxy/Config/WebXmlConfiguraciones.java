@@ -14,7 +14,6 @@ import javax.servlet.Servlet;
  */
 public class WebXmlConfiguraciones {
 
-    
     private WebXmlConfiguraciones(Servlet s) {
        _redisIpConfig =  s.getServletConfig().getServletContext().getInitParameter("RedisIpConf");
        _healthRequestUri = s.getServletConfig().getServletContext().getInitParameter("HealthRequestUri");
@@ -25,6 +24,7 @@ public class WebXmlConfiguraciones {
        _keyListaLimitados = s.getServletConfig().getServletContext().getInitParameter("keyListaLimitados");
        _usarRedis = s.getServletConfig().getServletContext().getInitParameter("usarRedis");
        _lastDefaultConfig = s.getServletConfig().getServletContext().getInitParameter("lastDefaultConfig");
+       _mongoDBHosts = s.getServletConfig().getServletContext().getInitParameter("hostsMongoDB");
        _lastUpdate = Calendar.getInstance();
        
     }
@@ -80,6 +80,9 @@ public class WebXmlConfiguraciones {
     public WebXmlConfiguraciones getInstance() {
         return _singleInstance;
     }
+    public static String GetMongoHosts() {
+        return _singleInstance._mongoDBHosts;
+    }
     
     private String _redisIpConfig;
     private String _healthRequestUri;
@@ -91,6 +94,7 @@ public class WebXmlConfiguraciones {
     private Calendar _lastUpdate;
     private String _usarRedis;
     private String _lastDefaultConfig;
+    private String _mongoDBHosts;
     //public String RedisIpConfig(){
         //if(_redisIpConfig == null)
         //    _redisIpConfig = s.getServletConfig().getServletContext().getInitParameter("RedisIpConf");
