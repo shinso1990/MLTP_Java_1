@@ -14,6 +14,16 @@ import javax.servlet.Servlet;
  */
 public class WebXmlConfiguraciones {
 
+    public static String mongoDBDatabase() {
+        return _singleInstance._mongoDBDatabase;
+    }
+
+    public static String GetMongoClientUri() {
+        return _singleInstance._mongoClientUri;
+    }
+    private final String _mongoClientUri;
+
+    
     private WebXmlConfiguraciones(Servlet s) {
        _redisIpConfig =  s.getServletConfig().getServletContext().getInitParameter("RedisIpConf");
        _healthRequestUri = s.getServletConfig().getServletContext().getInitParameter("HealthRequestUri");
@@ -24,9 +34,10 @@ public class WebXmlConfiguraciones {
        _keyListaLimitados = s.getServletConfig().getServletContext().getInitParameter("keyListaLimitados");
        _usarRedis = s.getServletConfig().getServletContext().getInitParameter("usarRedis");
        _lastDefaultConfig = s.getServletConfig().getServletContext().getInitParameter("lastDefaultConfig");
-       _mongoDBHosts = s.getServletConfig().getServletContext().getInitParameter("hostsMongoDB");
+       _mongoClientUri = s.getServletConfig().getServletContext().getInitParameter("mongoClientUri");
+       _guardarEstadisticasDeUso = s.getServletConfig().getServletContext().getInitParameter("guardarEstadisticasDeUso");
+       _mongoDBDatabase = s.getServletConfig().getServletContext().getInitParameter("mongoDBDatabase");
        _lastUpdate = Calendar.getInstance();
-       
     }
     
     public static void Inicializar(Servlet s) {
@@ -83,6 +94,10 @@ public class WebXmlConfiguraciones {
     public static String GetMongoHosts() {
         return _singleInstance._mongoDBHosts;
     }
+    public static boolean GuardarEstadisticasDeUso() {
+        return _singleInstance._guardarEstadisticasDeUso.equals("1");
+    }
+
     
     private String _redisIpConfig;
     private String _healthRequestUri;
@@ -95,12 +110,8 @@ public class WebXmlConfiguraciones {
     private String _usarRedis;
     private String _lastDefaultConfig;
     private String _mongoDBHosts;
-    //public String RedisIpConfig(){
-        //if(_redisIpConfig == null)
-        //    _redisIpConfig = s.getServletConfig().getServletContext().getInitParameter("RedisIpConf");
-    //    return _redisIpConfig;
-    //}
-    
+    private String _guardarEstadisticasDeUso;
+    private String _mongoDBDatabase;
     public static String AsString()
     {
         try{
@@ -111,7 +122,8 @@ public class WebXmlConfiguraciones {
                 "\"keyListaOK\":\"" + KeyListaOK()+ "\", "+
                 "\"keyListaLimitados\":\"" + KeyListaLimitados()+ "\", "+
                 "\"UsarRedis\":\"" + UsarRedis().toString()  + "\", "+
-                "\"LastDefaultConfig\":\"" + LastDefaultConfig() + "\" "+
+                "\"LastDefaultConfig\":\"" + LastDefaultConfig() + "\", "+
+                "\"GuardarEstadisticasDeUso\":\"" + GuardarEstadisticasDeUso() + "\" "+
                 "}";
         }
         catch(Exception e)

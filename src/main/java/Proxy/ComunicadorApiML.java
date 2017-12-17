@@ -7,6 +7,7 @@ package Proxy;
 
 import Proxy.Config.WebXmlConfiguraciones;
 import Proxy.Model.RequestResponseInfo;
+import Proxy.Model.Validacion;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -35,16 +36,11 @@ public class ComunicadorApiML {
         }
         catch(IOException e)
         {
+            Validacion.ErrorAlComunicarseConLaAPI(info, e);
+        }
+        finally
+        {
             info.closeWriter();
-            try
-            {
-                responseServlet.sendError((int)HttpServletResponse.SC_INTERNAL_SERVER_ERROR );
-                ErrorTracker.logError(e);
-            }
-            catch(IOException e1)
-            { 
-                ErrorTracker.logError(e1);
-            }
         }
     }
     

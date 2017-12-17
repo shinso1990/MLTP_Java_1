@@ -57,8 +57,8 @@ public class Receptor extends HttpServlet {
             }
         }
         info.sendResponse();
-        if(true) //hay que loguear en mongodb?
-            info.GuardarLog();
+        if(WebXmlConfiguraciones.GuardarEstadisticasDeUso()  ) 
+            new ComunicadorMongoDB().guardarEstadisticasDeUso( info.toMongoDocument() );
     }
 
     

@@ -13,8 +13,6 @@ import java.util.Calendar;
  */
 public class RedisConfig {
     
-    
-    
     private Boolean _bloqueado;
     private Long _cantMaxReq;
     private Integer _unidadMedidaTiempo;

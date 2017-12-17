@@ -15,7 +15,7 @@
     </session-config>
     <context-param>
         <param-name>RedisIpConf</param-name>
-        <param-value>redisproxy.rz5umx.ng.0001.use1.cache.amazonaws.com</param-value>
+        <param-value>redisproxy.rz5umx.ng.0001.use1.cache.amazonaws.com</param-value> 
     </context-param>
     <context-param>
         <param-name>HealthRequestUri</param-name>
@@ -50,8 +50,18 @@
         <param-value>1,10,0</param-value>
     </context-param>
     <context-param>
-        <param-name>hostsMongoDB</param-name>
-        <param-value>ec2-34-201-91-193.compute-1.amazonaws.com:27017</param-value>
+        <param-name>guardarEstadisticasDeUso</param-name>
+        <param-value>1</param-value>
     </context-param>
+    <context-param>
+        <param-name>mongoDBDatabase</param-name>
+        <param-value>admin</param-value>
+    </context-param>
+    <context-param>
+        <param-name>mongoClientUri</param-name>
+        <param-value>mongodb://alan:123456789@172.31.27.178:27017/admin?connectTimeoutMS=300000</param-value>
+    </context-param>
+    
+    
     
 </web-app>

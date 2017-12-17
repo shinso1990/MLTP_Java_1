@@ -5,6 +5,7 @@
  */
 package Proxy.Model;
 
+import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -15,9 +16,10 @@ import javax.servlet.http.HttpServletResponse;
 public class Validacion {
 
     public static void ErrorDesconocido(RequestResponseInfo info, Exception e)    {
-        info.MensajeError = "Error interno";
+        info.MensajeError = "Se produjo un error interno";
         info.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         info.HayError = true;
+        info.Exception = e;
     }
     
     public static void Ok(RequestResponseInfo info)    {
@@ -40,5 +42,13 @@ public class Validacion {
         info.TieneAcceso = false;
         info.MensajeError = "Se produjo un bloqueo por " + causa;
         info.Bloqueado = 1;
+    }
+
+    public static void ErrorAlComunicarseConLaAPI(RequestResponseInfo info, IOException e) {
+        info.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        info.CausaLimiteOBloqueo = e.getMessage();
+        info.TieneAcceso = true;
+        info.MensajeError = "Se produjo un error al comunicarse con la API" ;
+        info.HayError = true;
     }
 }
