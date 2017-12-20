@@ -45,8 +45,14 @@ public class ComunicadorRedis {
     private RedisConfig setAndGetDefaultRedisConfig(String key) {
         
         ComunicadorMongoDB cmdb = new ComunicadorMongoDB();
-        String config = cmdb.getConfigOrDefault(key).trim();
-       
+        String config = "";// cmdb.getConfigOrDefault(key).trim();
+        if(config.equals("") )
+        {
+            config = getJedisInstance().get("REDIS_DEFAULT_CONFIG");
+             if(config == null)
+                config = WebXmlConfiguraciones.LastDefaultConfig();  //NO DEBER�A USARSE ESTA CONFIGURACI�N
+        }
+        
         getJedisInstance().set(key, config);
 
         return new RedisConfig(config);

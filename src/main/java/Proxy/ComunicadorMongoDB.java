@@ -34,11 +34,9 @@ public class ComunicadorMongoDB {
         {
             String mongoClientUri = WebXmlConfiguraciones.GetMongoClientUri();
             
-            
             _mongoClient = new MongoClient(
                 new MongoClientURI( mongoClientUri )
             );
-            
         }
         return _mongoClient;
     }

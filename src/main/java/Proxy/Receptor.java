@@ -43,6 +43,7 @@ public class Receptor extends HttpServlet {
             info.setStatus(HttpServletResponse.SC_OK);
             PrintWriter pw =  info.getWriter();
             pw.write( WebXmlConfiguraciones.AsString() );
+            info.closeWriter();
         }
         else
         {
