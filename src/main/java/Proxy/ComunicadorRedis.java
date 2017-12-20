@@ -43,12 +43,13 @@ public class ComunicadorRedis {
     }
 
     private RedisConfig setAndGetDefaultRedisConfig(String key) {
-        String drc = getJedisInstance().get("REDIS_DEFAULT_CONFIG");
-        if(drc == null)
-            drc = WebXmlConfiguraciones.LastDefaultConfig();  //NO DEBER�A USARSE ESTA CONFIGURACI�N
-        getJedisInstance().set(key, drc);
+        
+        ComunicadorMongoDB cmdb = new ComunicadorMongoDB();
+        String config = cmdb.getConfigOrDefault(key).trim();
+       
+        getJedisInstance().set(key, config);
 
-        return new RedisConfig(drc);
+        return new RedisConfig(config);
     }
 
     Long Incr(String key) {
