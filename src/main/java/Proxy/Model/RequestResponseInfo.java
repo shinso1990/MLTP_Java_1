@@ -81,7 +81,7 @@ public class RequestResponseInfo {
         res.append("URI",URI);
         res.append("ResponseStatus",ResponseStatus);
         
-        if(Fecha != null)
+       if(Fecha != null)
             res.append("Fecha",Fecha.getTime());
         res.append("Permitido",Permitido);
         res.append("Bloqueado",Bloqueado);

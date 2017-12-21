@@ -27,7 +27,7 @@ public class RedisConfig {
     public RedisConfig(String redisValue)
     {
         String[] configs = redisValue.split(",");
-        _bloqueado = Boolean.parseBoolean(configs[0]);
+        _bloqueado = (Integer.parseInt(configs[0]) == 1)  ;
         _cantMaxReq = Long.parseLong(configs[1]);
         _unidadMedidaTiempo = Integer.parseInt(configs[2]);
     }
