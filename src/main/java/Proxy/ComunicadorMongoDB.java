@@ -55,6 +55,7 @@ public class ComunicadorMongoDB {
         try
         {
             mc = getMongoInstance();
+            //mc = getMongoInstance();
             mc.getDatabase( WebXmlConfiguraciones.mongoDBDatabase() ).getCollection("InfoReqRes").insertOne(doc);
         }
         finally
@@ -62,7 +63,7 @@ public class ComunicadorMongoDB {
             try
             {            
                 if(mc != null)
-                    mc.close();
+                    closeMongoInstance();
             }
             catch(Exception e){}
         }
@@ -72,10 +73,11 @@ public class ComunicadorMongoDB {
     public String getConfigOrDefault(String key)
     {
         String res = "";
-         MongoClient mc = null;
+        MongoClient mc = null;
         try
         {
             mc = getMongoInstance();
+            //mc = getMongoInstance();
             Bson filter = Filters.eq("Key", key);
             List<Document> docs = mc.getDatabase( WebXmlConfiguraciones.mongoDBDatabase() )
                     .getCollection("ConfiguracionesProxy")
@@ -101,7 +103,7 @@ public class ComunicadorMongoDB {
                 blo = "0";
             }
 
-            res = blo + "," + configElem.getString("CantidadTope")  + "," + configElem.getString("TipoContador");
+            res = blo + "," + configElem.getInteger("CantidadTope").toString()  + "," + configElem.getInteger("TipoContador").toString();
             
         }
         finally
@@ -109,7 +111,7 @@ public class ComunicadorMongoDB {
             try
             {            
                 if(mc != null)
-                    mc.close();
+                    closeMongoInstance();
             }
             catch(Exception e){}
             return res;

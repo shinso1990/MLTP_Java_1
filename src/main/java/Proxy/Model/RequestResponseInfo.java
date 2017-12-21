@@ -86,6 +86,13 @@ public class RequestResponseInfo {
         res.append("Permitido",Permitido);
         res.append("Bloqueado",Bloqueado);
         res.append("Limitado",Limitado);
+        int error = 0;
+        
+        if(HayError)
+            error = 1;
+        else 
+            error = 0;
+        res.append("Errado",error);
         
         
         String tcip = "";
